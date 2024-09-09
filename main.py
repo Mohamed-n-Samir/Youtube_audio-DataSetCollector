@@ -1,28 +1,10 @@
-from collect_data_functions import parse_arguments, videos_downloader, bulk_downloader
-from pathlib import Path
+from Classes.utils.helpers import parse_arguments
+from Classes.youtube_audio_dataset_collector import YoutubeAudioDatasetCollector
 
 args = parse_arguments()
 
-output_path = Path(args.output_dir)
-output_path.mkdir(exist_ok=True, parents=True)
-metadata_path = output_path / "metadata.jsonl"
+ydc = YoutubeAudioDatasetCollector(args.link_type,args.audio_type,args.output_dir,args.urls_file,args.caption_type,args.caption_lang)
 
-with open(args.urls_file, "r") as file:
-    urls = [line.strip() for line in file]
-urls = list(set(urls))
+ydc.handle_args_start_downloading()
 
 
-match args.link_type:
-    case "video":
-        videos_downloader(
-            urls, args.audio_type, output_path, metadata_path, args.caption_type
-        )
-    case "channel" | "playlist":
-        bulk_downloader(
-            urls,
-            args.audio_type,
-            output_path,
-            metadata_path,
-            args.link_type,
-            args.caption_type,
-        )
